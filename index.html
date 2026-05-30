@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compliance Engine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink:     #0e0e0e;
+      --paper:   #f5f0e8;
+      --cream:   #ede7d9;
+      --rule:    #c8bfaa;
+      --gold:    #b8860b;
+      --gold2:   #d4a017;
+      --red:     #8b1a1a;
+      --faded:   #8a7f6e;
+      --surface: #faf6ee;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'IBM Plex Mono', monospace;
+      min-height: 100vh;
+    }
+    .top-rule {
+      height: 4px;
+      background: repeating-linear-gradient(90deg, var(--gold) 0, var(--gold) 60%, transparent 60%, transparent 100%);
+      background-size: 8px 4px;
+    }
+    .masthead {
+      border-bottom: 2px solid var(--ink);
+      padding: 0 clamp(16px, 5vw, 48px);
+    }
+    .masthead-inner {
+      max-width: 900px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 0 16px;
+    }
+    .masthead-tag { font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 4px; }
+    .masthead-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 4vw, 2.6rem); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+    .masthead-title em { font-style: italic; color: var(--gold); }
+    .masthead-right { text-align: right; display: none; }
+    @media(min-width: 500px) { .masthead-right { display: block; } }
+    .edition { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--rule); margin-bottom: 4px; }
+    .dateline { font-size: 11px; color: var(--faded); }
+    .page { max-width: 900px; margin: 0 auto; padding: clamp(16px, 4vw, 40px) clamp(16px, 5vw, 48px); }
+    .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+    .section-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); font-weight: 500; white-space: nowrap; }
+    .section-rule { flex: 1; height: 1px; background: var(--rule); }
+    .upload-zone {
+      border: 1.5px dashed var(--rule); padding: 24px; text-align: center; cursor: pointer;
+      transition: all 0.2s; position: relative; background: var(--surface); margin-bottom: 16px;
+    }
+    .upload-zone:hover, .upload-zone.drag { border-color: var(--gold); background: #fdf8ee; }
+    .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-icon { font-size: 24px; margin-bottom: 8px; }
+    .upload-primary { font-size: 12px; color: var(--ink); margin-bottom: 4px; }
+    .upload-primary strong { color: var(--gold); border-bottom: 1px solid var(--gold); }
+    .upload-sub { font-size: 10px; color: var(--faded); letter-spacing: 0.05em; }
+    .upload-progress { display: none; align-items: center; gap: 10px; padding: 12px 16px; background: var(--cream); border: 1px solid var(--rule); font-size: 11px; color: var(--faded); margin-bottom: 12px; }
+    .upload-progress.active { display: flex; }
+    .pdf-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .pdf-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--ink); color: var(--paper); font-size: 10px; padding: 5px 10px; animation: fadeUp 0.3s ease both; }
+    .pdf-tag-name { max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pdf-tag-meta { color: var(--rule); font-size: 9px; }
+    .pdf-tag-remove { background: none; border: none; color: var(--rule); cursor: pointer; font-size: 12px; padding: 0; line-height: 1; transition: color 0.15s; }
+    .pdf-tag-remove:hover { color: #e06363; background: none; }
+    .divider { border: none; border-top: 1px solid var(--rule); margin: 24px 0; }
+    .chat-wrap { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
+    .chat-empty { padding: 32px 20px; text-align: center; border: 1px dashed var(--rule); background: var(--surface); }
+    .chat-empty-title { font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; color: var(--faded); margin-bottom: 8px; }
+    .chat-empty-sub { font-size: 10px; color: var(--rule); letter-spacing: 0.1em; text-transform: uppercase; }
+    .chat-entry { border-bottom: 1px solid var(--cream); animation: fadeUp 0.3s ease both; }
+    .chat-entry:last-child { border-bottom: none; }
+    .chat-q { padding: 14px 16px; background: var(--cream); font-size: 13px; color: var(--faded); display: flex; gap: 10px; align-items: baseline; }
+    .chat-q-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--rule); white-space: nowrap; }
+    .chat-a { padding: 16px 16px 14px; background: var(--surface); }
+    .chat-a-text { font-family: 'Playfair Display', serif; font-size: 16px; line-height: 1.75; color: var(--ink); margin-bottom: 10px; }
+    .chat-a-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 10px; color: var(--faded); }
+    .conf-badge { padding: 2px 8px; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; border: 1px solid; font-weight: 500; }
+    .conf-high   { border-color: var(--gold);  color: var(--gold); }
+    .conf-medium { border-color: #a07800; color: #a07800; }
+    .conf-low    { border-color: var(--red); color: var(--red); }
+    .src-pill { color: var(--gold); font-size: 10px; }
+    .src-hint { color: var(--faded); font-style: italic; font-family: 'Playfair Display', serif; font-size: 12px; }
+    .query-box { border: 2px solid var(--ink); background: white; position: relative; }
+    .query-box::before { content: 'YOUR QUESTION'; position: absolute; top: -1px; left: 16px; background: var(--ink); color: var(--paper); font-size: 8px; letter-spacing: 0.25em; padding: 2px 8px; transform: translateY(-50%); }
+    textarea { width: 100%; border: none; outline: none; resize: none; font-family: 'IBM Plex Mono', monospace; font-size: 14px; line-height: 1.7; color: var(--ink); background: transparent; padding: 20px 16px 14px; min-height: 80px; }
+    textarea::placeholder { color: var(--rule); }
+    .query-footer { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-top: 1px solid var(--cream); gap: 10px; }
+    .hint { font-size: 10px; color: var(--rule); letter-spacing: 0.05em; }
+    .query-btns { display: flex; gap: 8px; }
+    button.ask-btn { background: var(--ink); color: var(--paper); border: none; padding: 10px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: background 0.15s; }
+    button.ask-btn:hover { background: var(--gold); }
+    button.ask-btn:disabled { background: var(--rule); cursor: not-allowed; }
+    button.clear-btn { background: none; border: 1px solid var(--rule); color: var(--faded); padding: 10px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.1em; }
+    button.clear-btn:hover { border-color: var(--red); color: var(--red); background: none; }
+    .loading { display: none; align-items: center; gap: 12px; padding: 14px 16px; background: var(--cream); border: 1px solid var(--rule); font-size: 11px; color: var(--faded); margin-bottom: 12px; }
+    .loading.active { display: flex; }
+    .spinner { width: 14px; height: 14px; border: 2px solid var(--rule); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+    .error-toast { display: none; padding: 12px 16px; background: #fff5f5; border: 1px solid var(--red); font-size: 12px; color: var(--red); margin-bottom: 12px; }
+    .error-toast.visible { display: block; }
+    .status-bar { font-size: 10px; color: var(--faded); padding: 6px 0; margin-bottom: 8px; }
+    @media(max-width: 600px) { .query-footer { flex-direction: column; align-items: stretch; } .query-btns { justify-content: flex-end; } .hint { display: none; } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes spin     { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="top-rule"></div>
+<div class="masthead">
+  <div class="masthead-inner">
+    <div>
+      <div class="masthead-tag">AI · Compliance · Research</div>
+      <div class="masthead-title">The <em>Compliance</em> Desk</div>
+    </div>
+    <div class="masthead-right">
+      <div class="edition">Document Intelligence Engine</div>
+      <div class="dateline" id="dateline"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="status-bar" id="statusBar">Connecting to server…</div>
+
+  <div class="section-head">
+    <span class="section-label">Documents</span>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="upload-progress" id="uploadProgress">
+    <div class="spinner"></div>
+    <span id="uploadProgressText">Processing…</span>
+  </div>
+
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="pdfInput" accept=".pdf" multiple onchange="handleFileSelect(event)"/>
+    <div class="upload-icon">📋</div>
+    <div class="upload-primary"><strong>Upload compliance documents</strong></div>
+    <div class="upload-sub">PDF · Click or drag & drop · Multiple files supported</div>
+  </div>
+
+  <div class="pdf-tags" id="pdfTags"></div>
+  <hr class="divider"/>
+
+  <div class="section-head" style="margin-top:8px">
+    <span class="section-label">Correspondence</span>
+    <div class="section-rule"></div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <span>Searching documents & composing response…</span>
+  </div>
+
+  <div class="error-toast" id="errorCard"></div>
+
+  <div class="chat-wrap" id="chatWrap">
+    <div class="chat-empty" id="chatEmpty">
+      <div class="chat-empty-title">No questions yet</div>
+      <div class="chat-empty-sub">Upload a document and ask your first question</div>
+    </div>
+  </div>
+
+  <div class="query-box">
+    <textarea id="queryInput" rows="3" placeholder="Ask a compliance question in plain English…"></textarea>
+    <div class="query-footer">
+      <span class="hint">Enter to send · Shift+Enter for new line</span>
+      <div class="query-btns">
+        <button class="clear-btn" onclick="clearHistory()">Clear</button>
+        <button class="ask-btn" id="askBtn" onclick="askQuestion()">Send →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = 'http://127.0.0.1:8000';
+  let sessionId = null;
+
+  document.getElementById('dateline').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  async function initSession() {
+    try {
+      document.getElementById('statusBar').textContent = 'Connecting…';
+      const res = await fetch(`${API}/new-session`, { method: 'POST' });
+      const d   = await res.json();
+      sessionId = d.session_id;
+      document.getElementById('statusBar').textContent = 'Ready — upload a PDF to begin';
+    } catch(e) {
+      document.getElementById('statusBar').textContent = 'Server offline — try refreshing in 30 seconds';
+    }
+  }
+  initSession();
+
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); [...e.dataTransfer.files].forEach(uploadPDF); });
+
+  function handleFileSelect(e) {
+    [...e.target.files].forEach(uploadPDF);
+    e.target.value = '';
+  }
+
+  async function uploadPDF(file) {
+    if (!file.name.endsWith('.pdf')) { showError('Only PDF files supported.'); return; }
+
+    // If session lost (server restarted), recreate it
+    if (!sessionId) await initSession();
+
+    document.getElementById('uploadProgress').classList.add('active');
+    document.getElementById('uploadProgressText').textContent = `Processing "${file.name}"…`;
+    document.getElementById('errorCard').classList.remove('visible');
+
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('session_id', sessionId);
+
+    try {
+      let res = await fetch(`${API}/upload-pdf`, { method: 'POST', body: fd });
+
+      // Session lost because server restarted — recreate and retry
+      if (res.status === 404) {
+        await initSession();
+        fd.set('session_id', sessionId);
+        res = await fetch(`${API}/upload-pdf`, { method: 'POST', body: fd });
+      }
+
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.detail || 'Upload failed');
+      addPdfTag(d.filename, d.pages, d.chunks);
+      document.getElementById('statusBar').textContent = `✓ ${d.filename} loaded — ${d.chunks} chunks ready`;
+    } catch(err) {
+      showError('Upload failed: ' + err.message);
+    } finally {
+      document.getElementById('uploadProgress').classList.remove('active');
+    }
+  }
+
+  function addPdfTag(name, pages, chunks) {
+    const tags = document.getElementById('pdfTags');
+    const tag  = document.createElement('div');
+    tag.className = 'pdf-tag';
+    tag.id = `tag-${CSS.escape(name)}`;
+    tag.innerHTML = `<span class="pdf-tag-name">📄 ${name}</span><span class="pdf-tag-meta">${pages}p · ${chunks}c</span><button class="pdf-tag-remove" onclick="removePdf('${name}')" title="Remove">✕</button>`;
+    tags.appendChild(tag);
+  }
+
+  async function removePdf(name) {
+    if (!sessionId) return;
+    try {
+      await fetch(`${API}/session/${sessionId}/pdf/${encodeURIComponent(name)}`, { method: 'DELETE' });
+      const el = document.getElementById(`tag-${CSS.escape(name)}`);
+      if (el) el.remove();
+    } catch(e) { showError('Could not remove PDF.'); }
+  }
+
+  document.getElementById('queryInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); askQuestion(); }
+  });
+
+  function showError(msg) {
+    const ec = document.getElementById('errorCard');
+    ec.textContent = '⚠ ' + msg;
+    ec.classList.add('visible');
+    setTimeout(() => ec.classList.remove('visible'), 6000);
+  }
+
+  async function askQuestion() {
+    const q = document.getElementById('queryInput').value.trim();
+    if (!q) return;
+
+    // Recreate session if lost
+    if (!sessionId) await initSession();
+
+    document.getElementById('errorCard').classList.remove('visible');
+    document.getElementById('loading').classList.add('active');
+    document.getElementById('askBtn').disabled = true;
+    document.getElementById('queryInput').value = '';
+    document.getElementById('chatEmpty').style.display = 'none';
+
+    appendQ(q);
+
+    try {
+      let res = await fetch(`${API}/ask-compliance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, query: q }),
+      });
+
+      // Retry once if session lost
+      if (res.status === 404) {
+        await initSession();
+        res = await fetch(`${API}/ask-compliance`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId, query: q }),
+        });
+      }
+
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.detail || `Error ${res.status}`);
+      appendA(d);
+    } catch(err) {
+      showError(err.message || 'Something went wrong.');
+    } finally {
+      document.getElementById('loading').classList.remove('active');
+      document.getElementById('askBtn').disabled = false;
+    }
+  }
+
+  function appendQ(text) {
+    const wrap = document.getElementById('chatWrap');
+    const el   = document.createElement('div');
+    el.className = 'chat-entry';
+    el.innerHTML = `<div class="chat-q"><span class="chat-q-label">Q</span><span>${text}</span></div>`;
+    wrap.appendChild(el);
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function appendA(data) {
+    const conf  = (data.confidence || 'low').toLowerCase();
+    const entry = document.querySelector('.chat-entry:last-child');
+    const aDiv  = document.createElement('div');
+    aDiv.className = 'chat-a';
+    aDiv.innerHTML = `
+      <div class="chat-a-text">${data.answer}</div>
+      <div class="chat-a-meta">
+        <span class="conf-badge conf-${conf}">${conf} confidence</span>
+        ${data.source_pdf && data.source_pdf !== 'unknown' ? `<span class="src-pill">📄 ${data.source_pdf}</span>` : ''}
+        <span class="src-hint">${data.source_hint}</span>
+      </div>`;
+    entry.appendChild(aDiv);
+    aDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function clearHistory() {
+    if (!sessionId) return;
+    try {
+      await fetch(`${API}/clear-history/${sessionId}`, { method: 'POST' });
+      const wrap = document.getElementById('chatWrap');
+      wrap.innerHTML = '<div class="chat-empty" id="chatEmpty"><div class="chat-empty-title">No questions yet</div><div class="chat-empty-sub">Upload a document and ask your first question</div></div>';
+    } catch(e) {}
+  }
+</script>
+</body>
+</html>
