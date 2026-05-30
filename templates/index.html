@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Compliance Chronicle • AI Intelligence Desk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,500&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --ink: #1a1a1a;
+      --paper: #faf6ed;
+      --paper-dark: #ebe3d5;
+      --rule: #c9b896;
+      --gold: #c49a1f;
+      --gold-light: #e8c96e;
+      --gold-dark: #8b6914;
+      --ruby: #9b2c2c;
+      --ruby-light: #c94747;
+      --faded: #8a7f6e;
+      --cream: #f5efe5;
+      --surface: #ffffff;
+      --border: #e2d8cc;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* Newspaper Header */
+    .newspaper-header {
+      border-bottom: 3px solid var(--ink);
+      margin-bottom: 2rem;
+    }
+
+    .top-bar {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 6px 24px;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .main-header {
+      padding: 32px 24px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .newspaper-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .newspaper-name em {
+      font-style: italic;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .newspaper-motto {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--faded);
+      margin-bottom: 16px;
+    }
+
+    .header-details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--faded);
+    }
+
+    /* Layout */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 32px;
+    }
+
+    /* Left Column - Document Library */
+    .document-library {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      height: fit-content;
+      position: sticky;
+      top: 24px;
+    }
+
+    .library-header {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 16px 20px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .library-header span {
+      color: var(--gold);
+    }
+
+    .library-content {
+      padding: 20px;
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed var(--rule);
+      padding: 32px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: var(--cream);
+      margin-bottom: 24px;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--gold);
+      background: #fdf8ee;
+      transform: translateY(-2px);
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .upload-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--gold-dark);
+    }
+
+    .upload-sub {
+      font-size: 0.7rem;
+      color: var(--faded);
+    }
+
+    /* File Items */
+    .files-container {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .file-item {
+      background: var(--cream);
+      padding: 12px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--gold);
+      transition: all 0.2s;
+    }
+
+    .file-item:hover {
+      transform: translateX(4px);
+      background: #f0e8dc;
+    }
+
+    .file-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .file-meta {
+      font-size: 0.7rem;
+      color: var(--faded);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .remove-file {
+      background: none;
+      border: none;
+      color: var(--ruby);
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0 4px;
+      transition: opacity 0.2s;
+    }
+
+    .remove-file:hover {
+      opacity: 0.7;
+    }
+
+    /* Right Column - Conversation */
+    .conversation-area {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 180px);
+    }
+
+    .conversation-header {
+      background: linear-gradient(to bottom, var(--cream), var(--surface));
+      padding: 16px 24px;
+      border-bottom: 2px solid var(--gold);
+    }
+
+    .conversation-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .conversation-sub {
+      font-size: 0.7rem;
+      color: var(--faded);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Messages */
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: #fefcf8;
+    }
+
+    .message {
+      margin-bottom: 24px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .message-role {
+      font-weight: 600;
+    }
+
+    .message-role.user {
+      color: var(--gold-dark);
+    }
+
+    .message-role.assistant {
+      color: var(--ruby);
+    }
+
+    .message-time {
+      color: var(--faded);
+    }
+
+    .message-content {
+      padding-left: 24px;
+      border-left: 2px solid var(--rule);
+    }
+
+    .message.user .message-content {
+      border-left-color: var(--gold);
+    }
+
+    .message.assistant .message-content {
+      border-left-color: var(--ruby-light);
+    }
+
+    .message-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    /* Sources */
+    .sources {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .source-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(196, 154, 31, 0.1);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: var(--gold-dark);
+      margin-right: 8px;
+      margin-top: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .source-badge:hover {
+      background: rgba(196, 154, 31, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .confidence {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-left: 8px;
+    }
+
+    .confidence.high {
+      background: var(--gold-light);
+      color: var(--gold-dark);
+    }
+
+    .confidence.medium {
+      background: #e8d5b0;
+      color: #8b6914;
+    }
+
+    .confidence.low {
+      background: #f0d0d0;
+      color: var(--ruby);
+    }
+
+    /* Input Area */
+    .input-area {
+      padding: 20px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .input-wrapper {
+      border: 1px solid var(--border);
+      background: white;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(196, 154, 31, 0.1);
+    }
+
+    textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      padding: 16px;
+      background: transparent;
+    }
+
+    .input-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--cream);
+    }
+
+    .input-hint {
+      font-size: 0.65rem;
+      color: var(--faded);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .send-button {
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      padding: 8px 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .send-button:hover:not(:disabled) {
+      background: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    .send-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .clear-button {
+      background: none;
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-left: 8px;
+    }
+
+    .clear-button:hover {
+      border-color: var(--ruby);
+      color: var(--ruby);
+    }
+
+    /* Loading State */
+    .loading-indicator {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--cream);
+      margin-bottom: 16px;
+    }
+
+    .loading-indicator.active {
+      display: flex;
+    }
+
+    .loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--rule);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--faded);
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 12px 20px;
+      font-size: 0.8rem;
+      z-index: 1000;
+      display: none;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--cream);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--rule);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--gold);
+    }
+
+    @media (max-width: 768px) {
+      .two-columns {
+        grid-template-columns: 1fr;
+      }
+      
+      .document-library {
+        position: static;
+      }
+      
+      .conversation-area {
+        height: auto;
+        min-height: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="newspaper-header">
+    <div class="top-bar">
+      <span>EST. 2024</span>
+      <span>ARTIFICIAL INTELLIGENCE DESK</span>
+      <span>VOL. I</span>
+    </div>
+    <div class="main-header">
+      <div class="newspaper-name">The <em>Compliance</em> Chronicle</div>
+      <div class="newspaper-motto">"Truth • Intelligence • Integrity"</div>
+      <div class="header-details">
+        <span>SPECIAL EDITION</span>
+        <span id="currentDate"></span>
+        <span>AI-POWERED ANALYSIS</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="two-columns">
+      <!-- Left Column: Document Library -->
+      <div class="document-library">
+        <div class="library-header">
+          📜 The <span>Archives</span>
+        </div>
+        <div class="library-content">
+          <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">📄</div>
+            <div class="upload-title">Deposit Documents</div>
+            <div class="upload-sub">Click or drag PDFs • Multiple files</div>
+            <input type="file" id="fileInput" accept=".pdf" multiple style="display: none;">
+          </div>
+          
+          <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;">On Record</span>
+            <button class="clear-button" onclick="clearAllDocuments()" style="font-size: 0.6rem;">Purge All</button>
+          </div>
+          
+          <div class="files-container" id="filesContainer">
+            <div style="text-align: center; padding: 40px 20px; color: var(--faded);">
+              <div style="font-size: 48px; margin-bottom: 8px;">📭</div>
+              <div style="font-size: 0.8rem;">No documents archived</div>
+              <div style="font-size: 0.7rem; margin-top: 4px;">Upload a PDF to begin</div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.65rem; color: var(--faded); text-align: center;">
+            <span id="sessionIdDisplay"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Conversation -->
+      <div class="conversation-area">
+        <div class="conversation-header">
+          <div class="conversation-title">The Inquiry Desk</div>
+          <div class="conversation-sub">Pose your questions to the intelligence • Answers derived exclusively from archived documents</div>
+        </div>
+        
+        <div class="messages-container" id="messagesContainer">
+          <div class="empty-state">
+            <div class="empty-icon">📮</div>
+            <div class="empty-text">No correspondence yet</div>
+            <div style="font-size: 0.8rem; margin-top: 12px;">Upload a document and submit your first query</div>
+          </div>
+        </div>
+        
+        <div class="loading-indicator" id="loadingIndicator">
+          <div class="loading-spinner"></div>
+          <span>Consulting the archives & composing response...</span>
+        </div>
+        
+        <div class="input-area">
+          <div class="input-wrapper">
+            <textarea 
+              id="queryInput" 
+              rows="2" 
+              placeholder="Ask a compliance question... (e.g., 'What are the data retention requirements?')"
+              disabled
+            ></textarea>
+            <div class="input-footer">
+              <span class="input-hint">↵ Enter to send · ⇧ Enter for new line</span>
+              <div>
+                <button class="clear-button" onclick="clearConversation()">Clear Desk</button>
+                <button class="send-button" id="sendButton" disabled>Send →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Get session ID from cookie or create new
+    let sessionId = localStorage.getItem('compliance_session_id');
+    if (!sessionId) {
+      sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('compliance_session_id', sessionId);
+    }
+    
+    document.getElementById('sessionIdDisplay').innerHTML = `SESSION: ${sessionId.substr(-8)}`;
+    document.getElementById('currentDate').innerHTML = new Date().toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric',
+      year: 'numeric'
+    });
+    
+    let uploadedFiles = [];
+    let messages = [];
+    let isProcessing = false;
+    
+    // Load saved data from localStorage
+    function loadSavedData() {
+      const saved = localStorage.getItem(`compliance_${sessionId}`);
+      if (saved) {
+        const data = JSON.parse(saved);
+        uploadedFiles = data.files || [];
+        messages = data.messages || [];
+        renderFiles();
+        renderMessages();
+      }
+      updateUIState();
+    }
+    
+    function saveData() {
+      localStorage.setItem(`compliance_${sessionId}`, JSON.stringify({
+        files: uploadedFiles,
+        messages: messages
+      }));
+    }
+    
+    function updateUIState() {
+      const hasDocs = uploadedFiles.length > 0;
+      document.getElementById('queryInput').disabled = !hasDocs;
+      document.getElementById('sendButton').disabled = !hasDocs || isProcessing;
+      
+      if (!hasDocs) {
+        document.getElementById('queryInput').placeholder = "Upload a document to the archives first...";
+      } else {
+        document.getElementById('queryInput').placeholder = "Ask a compliance question...";
+      }
+    }
+    
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.background = isError ? 'var(--ruby)' : 'var(--ink)';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+    
+    // Upload PDF
+    async function uploadPDF(file) {
+      if (!file.name.endsWith('.pdf')) {
+        showToast('Only PDF documents accepted', true);
+        return;
+      }
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('session_id', sessionId);
+      
+      try {
+        showToast(`Processing ${file.name}...`);
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+          uploadedFiles.push({
+            name: file.name,
+            pages: result.pages,
+            chunks: result.chunks
+          });
+          saveData();
+          renderFiles();
+          showToast(`✓ ${file.name} archived (${result.pages} pages, ${result.chunks} segments)`);
+          updateUIState();
+        } else {
+          showToast(`Failed to archive ${file.name}`, true);
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        showToast(`Error archiving ${file.name}`, true);
+      }
+    }
+    
+    function renderFiles() {
+      const container = document.getElementById('filesContainer');
+      if (uploadedFiles.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px; color: var(--faded);">
+            <div style="font-size: 48px; margin-bottom: 8px;">📭</div>
+            <div style="font-size: 0.8rem;">No documents archived</div>
+            <div style="font-size: 0.7rem; margin-top: 4px;">Upload a PDF to begin</div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = uploadedFiles.map((file, idx) => `
+        <div class="file-item">
+          <div class="file-name">
+            <span>📄 ${file.name}</span>
+            <button class="remove-file" onclick="removeFile(${idx})">✕</button>
+          </div>
+          <div class="file-meta">${file.pages} pages • ${file.chunks} segments</div>
+        </div>
+      `).join('');
+    }
+    
+    function removeFile(index) {
+      uploadedFiles.splice(index, 1);
+      saveData();
+      renderFiles();
+      updateUIState();
+      if (uploadedFiles.length === 0) {
+        renderMessages(); // Clear messages if no docs
+      }
+    }
+    
+    async function clearAllDocuments() {
+      if (confirm('⚠️ Permanently remove all archived documents? This action cannot be undone.')) {
+        uploadedFiles = [];
+        saveData();
+        renderFiles();
+        updateUIState();
+        showToast('All documents removed from archives');
+      }
+    }
+    
+    function renderMessages() {
+      const container = document.getElementById('messagesContainer');
+      if (messages.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📮</div>
+            <div class="empty-text">No correspondence yet</div>
+            <div style="font-size: 0.8rem; margin-top: 12px;">Upload a document and submit your first query</div>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = messages.map(msg => `
+        <div class="message ${msg.role}">
+          <div class="message-meta">
+            <span class="message-role ${msg.role}">${msg.role === 'user' ? 'INTERROGATORY' : 'VERDICT'}</span>
+            <span class="message-time">${msg.time}</span>
+          </div>
+          <div class="message-content">
+            <div class="message-text">${msg.content}</div>
+            ${msg.sources ? `
+              <div class="sources">
+                ${msg.sources.map(s => `
+                  <span class="source-badge" onclick="showSource('${s.text.replace(/'/g, "\\'")}')">
+                    📄 ${s.source} (p.${s.page}) • ${Math.round(s.score * 100)}% relevance
+                  </span>
+                `).join('')}
+                <span class="confidence ${msg.confidence}">${msg.confidence} confidence</span>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+      
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    function showSource(text) {
+      alert(`Source excerpt:\n\n${text}`);
+    }
+    
+    async function askQuestion() {
+      const question = document.getElementById('queryInput').value.trim();
+      if (!question || isProcessing || uploadedFiles.length === 0) return;
+      
+      isProcessing = true;
+      updateUIState();
+      
+      // Add user message
+      messages.push({
+        role: 'user',
+        content: question,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      renderMessages();
+      
+      document.getElementById('queryInput').value = '';
+      document.getElementById('loadingIndicator').classList.add('active');
+      
+      try {
+        const response = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: sessionId,
+            question: question,
+            temperature: 0.1
+          })
+        });
+        
+        const data = await response.json();
+        
+        // Determine confidence level
+        let confidenceLevel = 'low';
+        if (data.confidence > 0.7) confidenceLevel = 'high';
+        else if (data.confidence > 0.4) confidenceLevel = 'medium';
+        
+        // Add assistant message
+        messages.push({
+          role: 'assistant',
+          content: data.answer,
+          sources: data.sources,
+          confidence: confidenceLevel,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+        
+        saveData();
+        renderMessages();
+        
+      } catch (error) {
+        console.error('Error:', error);
+        showToast('Error consulting the archives. Please try again.', true);
+      } finally {
+        isProcessing = false;
+        document.getElementById('loadingIndicator').classList.remove('active');
+        updateUIState();
+      }
+    }
+    
+    function clearConversation() {
+      if (messages.length > 0 && confirm('Clear the correspondence history?')) {
+        messages = [];
+        saveData();
+        renderMessages();
+        showToast('Correspondence cleared');
+      }
+    }
+    
+    // Event listeners
+    document.getElementById('queryInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        askQuestion();
+      }
+    });
+    
+    document.getElementById('sendButton').addEventListener('click', askQuestion);
+    
+    // Upload zone handlers
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    
+    uploadZone.addEventListener('click', () => fileInput.click());
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = 'var(--gold)';
+    });
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.style.borderColor = 'var(--rule)';
+    });
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = 'var(--rule)';
+      const files = Array.from(e.dataTransfer.files);
+      files.forEach(file => uploadPDF(file));
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      files.forEach(file => uploadPDF(file));
+      fileInput.value = '';
+    });
+    
+    // Load saved data on startup
+    loadSavedData();
+  </script>
+</body>
+</html>

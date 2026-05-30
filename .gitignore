@@ -1,0 +1,39 @@
+# Stop the current commit (Ctrl+C if still running)
+# Create .gitignore
+cat > .gitignore << 'EOF'
+# Virtual Environment
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data files
+data/
+*.db
+*.sqlite
+
+# Environment variables
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+EOF
