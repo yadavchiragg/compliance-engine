@@ -1,6 +1,3 @@
-Deployment Link: https://compliance-engine-4nyd.onrender.com
-
-
 # Compliance Engine
 
 A document intelligence tool that lets you upload compliance PDFs and ask questions about them. Built with FastAPI, Groq, and Cohere.
